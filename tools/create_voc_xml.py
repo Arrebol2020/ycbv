@@ -80,7 +80,6 @@ def create_xml(image_name, bboxes, objs, channel=3,
             node_ymax.text = '%s' % bottom
 
     xml = tostring(node_root, pretty_print=True)
-    dom = parseString(xml)
 
     save_xml = os.path.join(xml_root, image_name.replace(image_name[image_name.find(".")+1:], 'xml'))
     with open(save_xml, 'wb') as f:
@@ -121,11 +120,14 @@ def create_xmls(data_path, is_for_train=True):
 
                     bounding_boxes = []
                     objects = []
+                    object_ids = ""
                     for k, bbox in enumerate(bboxes):
                         bounding_boxes.append(bbox['bbox_visib'])
                         objects.append(objs[k]['obj_id'])
+                        object_ids += str(objs[k]['obj_id']) + "_"
 
-                    create_xml('tr_' + file + '_' + photos_path[index], bounding_boxes, objects, xml_root=annotations_path)
+                    create_xml(object_ids + 'tr_' + file + '_' + photos_path[index],
+                               bounding_boxes, objects, xml_root=annotations_path)
         else:
             for j in range(len(photos_path)):
                 print("当前：", file, photos_path[j])
@@ -140,18 +142,23 @@ def create_xmls(data_path, is_for_train=True):
 
                 bounding_boxes = []
                 objects = []
+                object_ids = ""
                 for k, bbox in enumerate(bboxes):
                     bounding_boxes.append(bbox['bbox_visib'])
                     objects.append(objs[k]['obj_id'])
+                    object_ids += str(objs[k]['obj_id']) + "_"
 
-                create_xml('te_' + file + '_' + photos_path[j], bounding_boxes, objects, xml_root=annotations_path)
+                create_xml(object_ids + 'te_' + file + '_' + photos_path[j],
+                           bounding_boxes, objects, xml_root=annotations_path)
 
 
 if __name__ == "__main__":
-    make_voc_dir()
+    make_voc_dir()  # 创建相关文件夹
+    # 相关的路径
     annotations_path = os.path.join(BASE_DIR, "..", "data", "VOC2007", "Annotations")
     path_train_real = os.path.join(BASE_DIR, "..", "data", "train_real")
     path_test19 = os.path.join(BASE_DIR, "..", "data", "bop19-20test")
 
-    create_xmls(data_path=path_test19, is_for_train=False)
-    create_xmls(data_path=path_train_real, is_for_train=True)
+    create_xmls(data_path=path_test19, is_for_train=False)  # 创建测试集的xml
+    create_xmls(data_path=path_train_real, is_for_train=True)  # 创建训练集的xml
+
