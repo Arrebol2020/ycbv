@@ -110,13 +110,10 @@ def create_xmls(data_path, is_for_train=True):
                 if index < len(photos_path):
                     print("当前：", file, photos_path[index])
                     photo_path = os.path.join(rgb_path, photos_path[index])  # 图片的路径
-                    new_photo_path = os.path.join(annotations_path, "..", "Images",
-                                                  'tr_' + file + '_' + photos_path[index])  # 新的图片路径
+
                     # +1 是因为json中的字典的key是从1开始的
                     bboxes = bboxes_info[str(int(photos_path[index][:-4]))]  # 获得当前图像中被识别物体的位置
                     objs = objs_info[str(int(photos_path[index][:-4]))]  # 获取图像中被识别物体的id
-
-                    shutil.copy(photo_path, new_photo_path)
 
                     bounding_boxes = []
                     objects = []
@@ -126,19 +123,20 @@ def create_xmls(data_path, is_for_train=True):
                         objects.append(objs[k]['obj_id'])
                         object_ids += str(objs[k]['obj_id']) + "_"
 
+                    new_photo_path = os.path.join(annotations_path, "..", "Images",
+                                                  object_ids + 'tr_' + file + '_' + photos_path[index])  # 新的图片路径
+                    shutil.copy(photo_path, new_photo_path)  # 复制图片
+
                     create_xml(object_ids + 'tr_' + file + '_' + photos_path[index],
                                bounding_boxes, objects, xml_root=annotations_path)
         else:
             for j in range(len(photos_path)):
                 print("当前：", file, photos_path[j])
                 photo_path = os.path.join(rgb_path, photos_path[j])  # 图片的路径
-                new_photo_path = os.path.join(annotations_path, "..", "Images",
-                                              'te_' + file + '_' + photos_path[j])  # 新的图片路径
+
                 # +1 是因为json中的字典的key是从1开始的
                 bboxes = bboxes_info[str(int(photos_path[j][:-4]))]  # 获得当前图像中被识别物体的位置
                 objs = objs_info[str(int(photos_path[j][:-4]))]  # 获取图像中被识别物体的id
-
-                shutil.copy(photo_path, new_photo_path)
 
                 bounding_boxes = []
                 objects = []
@@ -147,6 +145,10 @@ def create_xmls(data_path, is_for_train=True):
                     bounding_boxes.append(bbox['bbox_visib'])
                     objects.append(objs[k]['obj_id'])
                     object_ids += str(objs[k]['obj_id']) + "_"
+
+                new_photo_path = os.path.join(annotations_path, "..", "Images",
+                                              object_ids + 'te_' + file + '_' + photos_path[j])  # 新的图片路径
+                shutil.copy(photo_path, new_photo_path)
 
                 create_xml(object_ids + 'te_' + file + '_' + photos_path[j],
                            bounding_boxes, objects, xml_root=annotations_path)
@@ -157,7 +159,7 @@ if __name__ == "__main__":
     # 相关的路径
     annotations_path = os.path.join(BASE_DIR, "..", "data", "VOC2007", "Annotations")
     path_train_real = os.path.join(BASE_DIR, "..", "data", "train_real")
-    path_test19 = os.path.join(BASE_DIR, "..", "data", "bop19-20test")
+    path_test19 = os.path.join(BASE_DIR, "..", "data", "ycbv_test_bop19")
 
     create_xmls(data_path=path_test19, is_for_train=False)  # 创建测试集的xml
     create_xmls(data_path=path_train_real, is_for_train=True)  # 创建训练集的xml
