@@ -18,10 +18,10 @@ def make_voc_dir():
     创建voc的相关目录
     :return:
     """
-    os.makedirs(os.path.join(BASE_DIR, "..", "data", 'VOC2007/Annotations'))
-    os.makedirs(os.path.join(BASE_DIR, "..", "data", 'VOC2007/ImageSets'))
-    os.makedirs(os.path.join(BASE_DIR, "..", "data", 'VOC2007/ImageSets/Main'))
-    os.makedirs(os.path.join(BASE_DIR, "..", "data", 'VOC2007/Images'))
+    os.makedirs(os.path.join(BASE_DIR, "..", "fasterrcnn", "data", "VOCdevkit2007", 'VOC2007', 'Annotations'))
+    os.makedirs(os.path.join(BASE_DIR, "..", "fasterrcnn", "data", "VOCdevkit2007", 'VOC2007', 'ImageSets'))
+    os.makedirs(os.path.join(BASE_DIR, "..", "fasterrcnn", "data", "VOCdevkit2007", 'VOC2007', 'ImageSets/Main'))
+    os.makedirs(os.path.join(BASE_DIR, "..", "fasterrcnn", "data", "VOCdevkit2007", 'VOC2007', 'Images'))
 
 
 def create_xml(image_name, bboxes, objs, channel=3,
@@ -38,7 +38,6 @@ def create_xml(image_name, bboxes, objs, channel=3,
     :return:
     """
     from lxml.etree import Element, SubElement, tostring
-    from xml.dom.minidom import parseString
 
     random.seed(2021)
 
@@ -157,7 +156,7 @@ def create_xmls(data_path, is_for_train=True):
 if __name__ == "__main__":
     make_voc_dir()  # 创建相关文件夹
     # 相关的路径
-    annotations_path = os.path.join(BASE_DIR, "..", "data", "VOC2007", "Annotations")
+    annotations_path = os.path.join(BASE_DIR, "..", "fasterrcnn", "data", "VOCdevkit2007", "VOC2007", "Annotations")
     path_train_real = os.path.join(BASE_DIR, "..", "data", "train_real")
     path_test19 = os.path.join(BASE_DIR, "..", "data", "ycbv_test_bop19")
 

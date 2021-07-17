@@ -7,12 +7,12 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 def create_txt(val_rate=0.1):
     random.seed(2021)
 
-    xml_path = os.path.join(BASE_DIR, "..", "data", "VOC2007", "Annotations")
-    train_txt_path = os.path.join(BASE_DIR, "..", "data", "VOC2007",
+    xml_path = os.path.join(BASE_DIR, "..", "fasterrcnn", "data", "VOCdevkit2007", "VOC2007", "Annotations")
+    train_txt_path = os.path.join(BASE_DIR, "..", "fasterrcnn", "data", "VOCdevkit2007", "VOC2007",
                                   "ImageSets", "Main", "train.txt")
-    val_txt_path = os.path.join(BASE_DIR, "..", "data", "VOC2007",
+    val_txt_path = os.path.join(BASE_DIR, "..", "fasterrcnn", "data", "VOCdevkit2007", "VOC2007",
                                   "ImageSets", "Main", "val.txt")
-    test_txt_path = os.path.join(BASE_DIR, "..", "data", "VOC2007",
+    test_txt_path = os.path.join(BASE_DIR, "..", "fasterrcnn", "data", "VOCdevkit2007", "VOC2007",
                                  "ImageSets", "Main", "test.txt")
 
     xmls = os.listdir(xml_path)
