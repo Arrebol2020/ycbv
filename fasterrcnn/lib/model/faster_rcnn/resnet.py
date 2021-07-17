@@ -219,8 +219,15 @@ def resnet152(pretrained=False):
 
 class resnet(_fasterRCNN):
   def __init__(self, classes, num_layers=101, pretrained=False, class_agnostic=False):
-    self.model_path = 'data/pretrained_model/resnet101_caffe.pth'
     self.dout_base_model = 1024
+    self.num_layers = num_layers
+    if num_layers == 101:
+      self.model_path = 'data/pretrained_model/resnet101_caffe.pth'
+    elif num_layers == 50:
+      self.model_path = 'data/pretrained_model/resnet50_caffe.pth'
+    elif num_layers == 34:
+      self.model_path = 'data/pretrained_model/resnet34-333f7ec4.pth'
+      self.dout_base_model = 256
     self.pretrained = pretrained
     self.class_agnostic = class_agnostic
 
@@ -228,6 +235,12 @@ class resnet(_fasterRCNN):
 
   def _init_modules(self):
     resnet = resnet101()
+    if self.num_layers == 101:
+      resnet = resnet101()
+    elif self.num_layers == 50:
+      resnet = resnet50()
+    elif self.num_layers == 34:
+      resnet = resnet34()
 
     if self.pretrained == True:
       print("Loading pretrained weights from %s" %(self.model_path))
@@ -240,11 +253,18 @@ class resnet(_fasterRCNN):
 
     self.RCNN_top = nn.Sequential(resnet.layer4)
 
-    self.RCNN_cls_score = nn.Linear(2048, self.n_classes)
-    if self.class_agnostic:
-      self.RCNN_bbox_pred = nn.Linear(2048, 4)
+    if self.num_layers < 40:
+      self.RCNN_cls_score = nn.Linear(512, self.n_classes)
+      if self.class_agnostic:
+        self.RCNN_bbox_pred = nn.Linear(512, 4)
+      else:
+        self.RCNN_bbox_pred = nn.Linear(512, 4 * self.n_classes)
     else:
-      self.RCNN_bbox_pred = nn.Linear(2048, 4 * self.n_classes)
+      self.RCNN_cls_score = nn.Linear(2048, self.n_classes)
+      if self.class_agnostic:
+        self.RCNN_bbox_pred = nn.Linear(2048, 4)
+      else:
+        self.RCNN_bbox_pred = nn.Linear(2048, 4 * self.n_classes)
 
     # Fix blocks
     for p in self.RCNN_base[0].parameters(): p.requires_grad=False

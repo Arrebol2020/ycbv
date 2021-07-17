@@ -15,6 +15,7 @@ import argparse
 import pprint
 import pdb
 import time
+import random
 
 import torch
 from torch.autograd import Variable
@@ -32,6 +33,16 @@ from model.utils.net_utils import weights_normal_init, save_net, load_net, \
 
 from model.faster_rcnn.vgg16 import vgg16
 from model.faster_rcnn.resnet import resnet
+
+
+def set_seed(seed=2021):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)  # 为CPU设置随机种子
+    torch.cuda.manual_seed(seed)  # 为当前GPU设置随机种子
+    torch.cuda.manual_seed_all(seed)  # 为所有GPU设置随机种子
+
+
 
 def parse_args():
   """
@@ -145,8 +156,10 @@ class sampler(Sampler):
   def __len__(self):
     return self.num_data
 
+
 if __name__ == '__main__':
 
+  set_seed()
   args = parse_args()
 
   print('Called with args:')
