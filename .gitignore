@@ -1,3 +1,4 @@
 /data/
 fasterrcnn/data/*
 fasterrcnn/models/*
+resnet/data/*
