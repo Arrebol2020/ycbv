@@ -110,7 +110,6 @@ def create_xmls(data_path, is_for_train=True):
                     print("当前：", file, photos_path[index])
                     photo_path = os.path.join(rgb_path, photos_path[index])  # 图片的路径
 
-                    # +1 是因为json中的字典的key是从1开始的
                     bboxes = bboxes_info[str(int(photos_path[index][:-4]))]  # 获得当前图像中被识别物体的位置
                     objs = objs_info[str(int(photos_path[index][:-4]))]  # 获取图像中被识别物体的id
 

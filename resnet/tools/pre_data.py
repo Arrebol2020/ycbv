@@ -39,9 +39,9 @@ def parse_json(json_path):
 def process_data(data_path, save_root):
     for i, file in enumerate(os.listdir(data_path)):  # data_path
         # 拼接成完整的路径
-        rgb_path = os.path.join(os.path.join(path_train_real, file), 'rgb')
-        scene_gt_info_path = os.path.join(os.path.join(path_train_real, file), "scene_gt_info.json")
-        scene_gt_path = os.path.join(os.path.join(path_train_real, file), "scene_gt.json")
+        rgb_path = os.path.join(os.path.join(data_path, file), 'rgb')
+        scene_gt_info_path = os.path.join(os.path.join(data_path, file), "scene_gt_info.json")
+        scene_gt_path = os.path.join(os.path.join(data_path, file), "scene_gt.json")
 
         photos_path = os.listdir(rgb_path)  # 读取rgb文件夹下的图片
         bboxes_info = parse_json(scene_gt_info_path)
@@ -53,24 +53,29 @@ def process_data(data_path, save_root):
             if index < len(photos_path):
                 photo_path = os.path.join(rgb_path, photos_path[index])  # 图片的路径
                 # +1 是因为json中的字典的key是从1开始的
-                bboxes = bboxes_info[str(index + 1)]  # 获得当前图像中被识别物体的位置
-                objs = objs_info[str(index + 1)]  # 获取挡墙图像中被识别物体的id
+                bboxes = bboxes_info[str(int(photos_path[index][:-4]))]  # 获得当前图像中被识别物体的位置
+                objs = objs_info[str(int(photos_path[index][:-4]))]  # 获取图像中被识别物体的id
+
+                print(photo_path, bboxes, objs)
 
                 for k, bbox in enumerate(bboxes):
                     img = cv2.imread(photo_path)  # 读取图片
                     bbox = bbox['bbox_visib']  # 获取bounding box，左上角的点坐标、w、h
-                    if -1 not in bbox and 0 not in bbox:
-                        img = img[bbox[1]:bbox[1] + bbox[3], bbox[0]:bbox[0] + bbox[2]]  # 裁剪图片
-                        obj = objs[k]['obj_id']  # 裁剪区域图片的id
 
-                        path_obj = os.path.join(save_root, str(obj))  # 保存裁剪图像的路径
+                    if -1 not in bbox and 0 not in bbox:  # 剔除没有区域的数据
+                        # 其中一个低于15，两个都低于30的不要
+                        # 15 ，30以上
+                        if (bbox[2] > 15 and bbox[3] > 30) or (bbox[2] > 30 and bbox[3] > 15):
 
-                        print(photo_path, bbox, obj, bbox.count(-1))
+                            img = img[bbox[1]:bbox[1] + bbox[3], bbox[0]:bbox[0] + bbox[2]]  # 裁剪图片
+                            obj = objs[k]['obj_id']  # 裁剪区域图片的id
 
-                        if not os.path.exists(path_obj):  # 若该分类没有文件夹，则创建
-                            os.makedirs(path_obj)
+                            path_obj = os.path.join(save_root, str(obj))  # 保存裁剪图像的路径
 
-                        cv2.imwrite(os.path.join(path_obj, file + '_' + photos_path[index]), img)  # 保存图片
+                            if not os.path.exists(path_obj):  # 若该分类没有文件夹，则创建
+                                os.makedirs(path_obj)
+
+                            cv2.imwrite(os.path.join(path_obj, file + '_' + photos_path[index]), img)  # 保存图片
 
 
 if __name__ == "__main__":
