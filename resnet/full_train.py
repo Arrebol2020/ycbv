@@ -19,7 +19,10 @@ CFG = {
     "batch_size": 32,
     "num_workers": 4,
     "optimizer": "Adam",
-    "lr": 0.0003,
+    'T_0': 10,
+    'lr': 1e-4,
+    'min_lr': 1e-6,
+    'weight_decay': 1e-6,
     "model_save": os.path.join(BASE_DIR, "data", "model"),
     "verbose_step": 1
 }
@@ -37,9 +40,8 @@ def set_seed(seed=2021):
 
 
 def get_model(pretrained=False):
-    if pretrained:
-        net = torchvision.models.resnet50(pretrained=pretrained)
-    else:
+    net = torchvision.models.resnet50(pretrained=pretrained)
+    if not pretrained:
         net = torchvision.models.resnet50(pretrained=pretrained)
         # 加载权重
         model_weight_path = os.path.join(BASE_DIR, "data", "pretrain_model", "resnet50_caffe.pth")
@@ -82,6 +84,7 @@ if __name__ == "__main__":
     data_transform = {
         "train": transforms.Compose([transforms.RandomResizedCrop(224),
                                      transforms.RandomHorizontalFlip(0.5),
+                                     transforms.RandomRotation((-45, 45)),
                                      transforms.ToTensor(),
                                      transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
         "test": transforms.Compose([transforms.Resize(256),
@@ -126,8 +129,9 @@ if __name__ == "__main__":
 
     # 训练
     loss_fc = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=CFG["lr"])
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
+    optimizer = torch.optim.Adam(model.parameters(), lr=CFG["lr"], weight_decay=CFG['weight_decay'])
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=CFG['T_0'], T_mult=1,
+                                                                     eta_min=CFG['min_lr'], last_epoch=-1)
 
     if CFG["optimizer"] == "Adam":
         pass
