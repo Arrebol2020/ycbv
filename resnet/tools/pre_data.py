@@ -63,7 +63,7 @@ def process_data(data_path, save_root):
                         img = img[bbox[1]:bbox[1] + bbox[3], bbox[0]:bbox[0] + bbox[2]]  # 裁剪图片
                         obj = objs[k]['obj_id']  # 裁剪区域图片的id
 
-                        path_obj = os.path.join(path_train, str(obj))
+                        path_obj = os.path.join(save_root, str(obj))  # 保存裁剪图像的路径
 
                         print(photo_path, bbox, obj, bbox.count(-1))
 
